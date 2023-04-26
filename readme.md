@@ -34,7 +34,7 @@ This is a clip of great effect, but the real effect will fluctuate
 </video>
 </center>
 
-[点击观看视频演示](DisplayVideo/sloth.MP4)
+[Click to watch the video demo](DisplayVideo/sloth.MP4)
  
 ### Gyro strike(Kill infantry of 100 HP in 5 seconds)
  <center>
@@ -43,6 +43,8 @@ This is a clip of great effect, but the real effect will fluctuate
 </video>
 </center>
 
+[Click to watch the video demo](DisplayVideo\gyro.MP4)
+
 ### Moving object strike
  <center>
 <video width="480" height="240" controls>
@@ -50,7 +52,7 @@ This is a clip of great effect, but the real effect will fluctuate
 </video>
 </center>
 
-
+[Click to watch the video demo](DisplayVideo\move.MP4)
 
  
 ---
