@@ -34,7 +34,7 @@ This is a clip of great effect, but the real effect will fluctuate
 </video>
 </center>
 
-[点击观看视频演示](DisplayVideo\sloth.mp4)
+[点击观看视频演示](DisplayVideo/sloth.mp4)
  
 ### Gyro strike(Kill infantry of 100 HP in 5 seconds)
  <center>
