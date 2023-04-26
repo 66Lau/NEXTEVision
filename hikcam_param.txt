@@ -1,0 +1,36 @@
+>> cameraParams
+
+cameraParams = 
+
+  cameraParameters - 属性:
+
+   Camera Intrinsics
+                         Intrinsics: [1×1 cameraIntrinsics]
+
+   Camera Extrinsics
+                   RotationMatrices: [3×3×22 double]
+                 TranslationVectors: [22×3 double]
+
+   Accuracy of Estimation
+              MeanReprojectionError: 0.4833
+                 ReprojectionErrors: [54×2×22 double]
+                  ReprojectedPoints: [54×2×22 double]
+
+   Calibration Settings
+                        NumPatterns: 22
+                  DetectedKeypoints: [54×22 logical]
+                        WorldPoints: [54×2 double]
+                         WorldUnits: 'millimeters'
+                       EstimateSkew: 0
+    NumRadialDistortionCoefficients: 2
+       EstimateTangentialDistortion: 0
+
+>> cameraParams.IntrinsicMatrix
+
+ans =
+
+   1.0e+03 *
+
+    1.5724         0         0
+         0    1.5724         0
+    0.6550    0.5034    0.0010
