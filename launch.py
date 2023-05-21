@@ -86,6 +86,8 @@ while 1:
     ArmorDetector.InfoPlate =cv2.resize(ArmorDetector.InfoPlate, (640, 480))
     merged_frame = np.hstack((ArmorDetector.img, ArmorDetector.dst,ArmorDetector.InfoPlate))
     cv2.imshow('Merged Frames', merged_frame)
+    cv2.namedWindow("img", 0)
+
     cv2.imshow("img", img)
 
 

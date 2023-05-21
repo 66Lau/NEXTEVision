@@ -197,10 +197,12 @@ class ArmorDetector:
 
                     # print(data_rai)
                     # rint("------")
+                    print("装甲板间距:" + str(abs(data_rxi - data_rxc)))
+                    print("灯条长度:" + str((data_rwi + data_rwc) / 2))
 
                     if (abs(data_ryi - data_ryc) <= self.DataParam.highRshort * ((data_rhi + data_rhc) / 2)) \
                             and ((abs(data_rxi - data_rxc) <= self.DataParam.XRlongMaxB * ((data_rwi + data_rwc) / 2)) and (abs(data_rxi - data_rxc) >= self.DataParam.XRlongMinB * ((data_rwi + data_rwc) / 2))
-                                 or (abs(data_rxi - data_rxc) <= self.DataParam.XRlongMaxS * ((data_rwi + data_rwc) / 2)) and (abs(data_rxi - data_rxc) >= self.DataParam.XRlongMaxS * ((data_rwi + data_rwc) / 2))) \
+                                 or (abs(data_rxi - data_rxc) <= self.DataParam.XRlongMaxS * ((data_rwi + data_rwc) / 2)) and (abs(data_rxi - data_rxc) >= self.DataParam.XRlongMinS * ((data_rwi + data_rwc) / 2))) \
                             and (abs(data_rhi - data_rhc) <= self.DataParam.DiffRMaxS * max(data_rhi, data_rhc)) \
                             and (abs(data_rwi - data_rwc) <= self.DataParam.DiffRMaxL * max(data_rwi, data_rwc)) \
                             and ((abs(data_rai - data_rac) <= self.DataParam.DiffAngle) or (abs((abs(data_rai - data_rac) - 90)) <= self.DataParam.DiffAngle)):
@@ -212,6 +214,8 @@ class ArmorDetector:
                         w1-w2  (两个灯条的长边之差)  <=  0.5（w1,w2的最大值）两个灯条的长边最大值
                         ra1-ra2 (两个灯条的角度差) <=6 or(两个灯条距离90度的角度差--主要为了防止0度和90度跳变)
                         '''
+
+
                         second_data1.append(first_data[i])
                         second_data2.append(first_data[c])  # 将平行的矩形成对存入
                         # print("装甲板矩形测试通过")
@@ -259,6 +263,12 @@ class ArmorDetector:
                     point2_3y = second_data2[i]["y3"]
                     point2_4x = second_data2[i]["x4"]
                     point2_4y = second_data2[i]["y4"]
+                    midpoint1, midpoint2 = self.Rectangle2Light((point1_1x,point1_1y), (point1_2x,point1_2y), (point1_3x,point1_3y), (point1_4x,point1_4y))
+                    midpoint3, midpoint4 = self.Rectangle2Light((point2_1x,point2_1y), (point2_2x,point2_2y), (point2_3x,point2_3y), (point2_4x,point2_4y))
+                    print(midpoint1, midpoint2)
+                    cv2.line(frame, midpoint1, midpoint2, (0, 225, 100), 2, 1)
+                    cv2.line(frame, midpoint3, midpoint4, (0, 225, 100), 2, 1)
+
 
                     self.plot_armor(frame, second_data1[i]["coor"], second_data2[i]["coor"])
                     cv2.putText(frame, "target1:", (rectangle_x2, rectangle_y2 - 5), cv2.FONT_HERSHEY_SIMPLEX,
@@ -279,12 +289,14 @@ class ArmorDetector:
                     """
                     这里要加灯条宽度======================这里距离不准确=========================
                     """
-                    print("面积", second_data2[i]["area"])  # 取当前装甲板的灯条的面积作为判别距离的标准
-                    distance = (1 / second_data2[i]["area"]) * 20000 / 18
-
+                    print("面积", (second_data2[i]["rh"]*second_data2[i]["rw"]+second_data1[i]["rh"]*second_data1[i]["rw"]))  # 取当前装甲板的灯条的面积作为判别距离的标准
+                    # distance = (1 / (second_data2[i]["rh"]*second_data2[i]["rw"]+second_data1[i]["rh"]*second_data1[i]["rw"])) * 20000 / 80
+                    s=(second_data2[i]["rh"]*second_data2[i]["rw"]+second_data1[i]["rh"]*second_data1[i]["rw"])
+                    distance = 18.73*(s**(-0.3572))
                     print("距离", distance)
                     self.distance = round(distance, 2)
                     distance_rise = self.distance * self.DataParam.Distance_K
+                    print(distance_rise)
                     if distance_rise >= self.DataParam.RiseValue:
                         distance_rise = self.DataParam.RiseValue
                     cv2.putText(frame, 'distance is' + str(distance) + " m",
@@ -363,12 +375,12 @@ class ArmorDetector:
         if not self.center == '---not find---':
             delta_x, delta_y = self.kalman.track(self.center[0], self.center[1])
             # 画出图像中心画出卡尔曼预测后的装甲板中心
-            cv2.circle(self.img, (int(delta_x) * self.DataParam.kalmanKP + self.center[0],
-                                  int(delta_y) * self.DataParam.kalmanKP + self.center[1]),
+            cv2.circle(self.img, (int((delta_x) * self.DataParam.kalmanKP + self.center[0]),
+                                  int((delta_y) * self.DataParam.kalmanKP + self.center[1])),
                                   20, (120, 120, 0),-1)
             if self.DataParam.IfKalman:
-                self.center_result[0] = int(delta_x)*0 + self.center[0]
-                self.center_result[1] = int(delta_y)*0 + self.center[1]
+                self.center_result[0] = int(delta_x)*self.DataParam.kalmanKP + self.center[0]
+                self.center_result[1] = int(delta_y)*self.DataParam.kalmanKP + self.center[1]
             else:
                 self.center_result[0] = self.center[0]
                 self.center_result[1] = self.center[1]
@@ -394,4 +406,41 @@ class ArmorDetector:
             print("熄火N")
 
 
+    def Rectangle2Light(self,Recpoint1,Recpoint2,Recpoint3,Recpoint4):
+        """
+        此函数用来将灯条的四个点转换成长边的两点
+        输入：矩形的四个点的坐标（x，y）
+        输出：穿过矩形短边的长边两点
+        """
 
+        def calculate_midpoint(point1, point2):
+            # 计算两点之间的中点
+            x1, y1 = point1
+            x2, y2 = point2
+            midpoint = (int((x1 + x2) / 2), int((y1 + y2) / 2))
+            return midpoint
+
+        # 计算边的长度
+        edge1_length = self.calculate_distance(Recpoint1, Recpoint2)
+        edge2_length = self.calculate_distance(Recpoint2, Recpoint3)
+        edge3_length = self.calculate_distance(Recpoint3, Recpoint4)
+        edge4_length = self.calculate_distance(Recpoint4, Recpoint1)
+
+        # 找到两条最短的边
+        shortest_edges = sorted([(edge1_length, Recpoint1, Recpoint2),
+                                 (edge2_length, Recpoint2, Recpoint3),
+                                 (edge3_length, Recpoint3, Recpoint4),
+                                 (edge4_length, Recpoint4, Recpoint1)])
+
+        # 找到两条最短边的中点
+        midpoint1 = calculate_midpoint(shortest_edges[0][1], shortest_edges[0][2])
+        midpoint2 = calculate_midpoint(shortest_edges[1][1], shortest_edges[1][2])
+
+        return midpoint1, midpoint2
+
+    def calculate_distance(self, point1, point2):
+        # 计算两点之间的距离（欧几里德距离）
+        x1, y1 = point1
+        x2, y2 = point2
+        distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+        return distance

@@ -80,6 +80,7 @@ class SerialClass:
         try:
             # ========数据格式处理=========
             yaw = int(100*(yaw + 90))
+
             pitch = int(100*(pitch + 90))
             if yaw < 10000:
                 str_yaw = "0"+str(yaw)

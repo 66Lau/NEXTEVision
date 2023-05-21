@@ -16,7 +16,7 @@ class PointTrans:
         if not center == '---not find---':
             x_distance = center[0] - cenpoint[0]
             y_distance = -(center[1] - cenpoint[1])
-            print(x_distance,y_distance)
+            print('目标装甲板像素差',x_distance,y_distance)
             self.distance = (x_distance, y_distance)
             # 像素坐标转换为转角，详见： https://blog.csdn.net/u010750137/article/details/97646798
             pts = np.float32([center[0], center[1]])
@@ -37,7 +37,11 @@ class PointTrans:
 
             self.yaw = math.atan((undistort_pts[0, 0, 0] - cx) / fx) * 360 / math.pi / 2
             self.pitch = math.atan((cy - undistort_pts[0, 0, 1]) / fy) * 360 / math.pi / 2
+            if x_distance==0 and y_distance ==0:
+                self.yaw = 0
+                self.pitch = 0
+            print('坐标系转换后的yaw和pitch',  self.yaw,self.pitch)
 
         if center == '---not find---':
-            self.yaw = 0
-            self.pitch = 0
+            self.yaw = 0.00
+            self.pitch = 0.00
